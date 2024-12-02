@@ -1,11 +1,10 @@
 import User from "../../database/models/user_model";
 import Post from "../../database/models/post_model";
-import Request from "../../database/models/request_model";
 
 const store = async (req, res) => {
   try {
     const { name, username, password, image, connections, requests } = req.body;
-    const user = await User.create({ name, username, password, image, connections, requests });
+    await User.create({ name, username, password, image, connections, requests });
 
     res.sendStatus(204);
   } catch (error) {
@@ -26,7 +25,86 @@ const create_post = async (req, res) => {
     } catch (error) {
         res.status(500).send(error.message);
     }
-}; //TODO terminar funções
+};
+
+const sendRequest = async (req, res) => {
+  try {
+      const senderId = req.params.id; 
+      const { receiverId } = req.body; 
+
+      
+      const user = await User.findById(senderId);
+      if (user.requests.includes(receiverId)) {
+          return res.status(400).send('Request already exists');
+      }
+
+      
+      user.requests.push(receiverId);
+      await user.save();
+
+      
+      const receiver = await User.findById(receiverId);
+      receiver.requests.push(senderId);
+      await receiver.save();
+
+      res.status(201).send('Request sent successfully.');
+  } catch (error) {
+      res.status(500).send(error.message);
+  }
+};
+
+const acceptRequest = async (req, res) => {
+  try {
+      const receiverId = req.params.id; 
+      const { senderId } = req.body; 
+
+      
+      const receiver = await User.findById(receiverId);
+      if (!receiver.requests.includes(senderId)) {
+          return res.status(404).send('Request not found');
+      }
+
+      
+      receiver.requests.pull(senderId);
+      receiver.connections.push(senderId);
+      await receiver.save();
+
+      
+      const sender = await User.findById(senderId);
+      sender.connections.push(receiverId);
+      await sender.save();
+
+      res.status(200).send('Request accepted successfully.');
+  } catch (error) {
+      res.status(500).send(error.message);
+  }
+};
+
+const rejectRequest = async (req, res) => {
+  try {
+      const receiverId = req.params.id; 
+      const { senderId } = req.body; 
+
+      
+      const receiver = await User.findById(receiverId);
+      if (!receiver.requests.includes(senderId)) {
+          return res.status(404).send('Request not found');
+      }
+
+      
+      receiver.requests.pull(senderId);
+      await receiver.save();
+
+      
+      const sender = await User.findById(senderId);
+      sender.requests.pull(receiverId);
+      await sender.save();
+
+      res.status(200).send('Request rejected successfully.');
+  } catch (error) {
+      res.status(500).send(error.message);
+  }
+};
 
 const index = async (req, res) => {
   try {
@@ -81,6 +159,10 @@ const destroy = async (req, res) => {
 
 export default {
   store,
+  create_post,
+  sendRequest,
+  acceptRequest,
+  rejectRequest,
   index,
   show,
   update,
