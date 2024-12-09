@@ -1,5 +1,5 @@
-import User from "../../database/models/user_model";
-import Post from "../../database/models/post_model";
+import User from "../../database/models/user_model.js";
+import Post from "../../database/models/post_model.js";
 
 const store = async (req, res) => {
   try {

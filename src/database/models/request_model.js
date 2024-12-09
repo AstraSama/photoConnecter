@@ -19,7 +19,7 @@ const user_request = new Schema({
 })
 
 const request_Schema = new Schema({
-    user_list: [ user_request ]
+    user_list_request: [ user_request ]
 });
 
 const Request = model("Request", request_Schema);

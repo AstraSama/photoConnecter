@@ -1,9 +1,9 @@
-import Connection from "../../database/models/connection_model"
+import Connection from "../../database/models/connection_model.js"
 
 const store = async (req, res) => {
   try {
-    const { user_list } = req.body;
-    await Connection.create({ user_list });
+    const { user_list_connect } = req.body;
+    await Connection.create({ user_list_connect });
 
     res.sendStatus(204);
   } catch (error) {
@@ -34,10 +34,10 @@ const show = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const { user_list } = req.body;
+    const { user_list_connect } = req.body;
 
     await Connection.findByIdAndUpdate(req.params.id, {
-        user_list
+        user_list_connect
     }).exec();
 
     res.sendStatus(204);
