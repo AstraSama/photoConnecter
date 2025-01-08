@@ -10,7 +10,7 @@ const image_Schema = new Schema({
         required: false
     }
 })
-
+//TODO alterar post + add comentários
 const post_Schema = new Schema({
     user: {
         type: Schema.ObjectId,
